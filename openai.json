@@ -1,0 +1,327 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Robocoders API",
+      "description": "API for Robocoders.ai, an AI-powered development assistant",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/docs": {
+        "get": {
+          "summary": "Redirect Docs",
+          "operationId": "redirect_docs_docs_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {}
+                }
+              }
+            }
+          }
+        }
+      },
+      "/login": {
+        "get": {
+          "tags": [
+            "authentication"
+          ],
+          "summary": "Google Auth",
+          "description": "Redirect the user to Google's OAuth 2.0 authentication page.",
+          "operationId": "google_auth_login_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {}
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/google/callback": {
+        "get": {
+          "tags": [
+            "authentication"
+          ],
+          "summary": "Google Callback",
+          "description": "Handle the callback from Google OAuth2 authentication.\n\nThis endpoint exchanges the authorization code for an access token,\nverifies the token, creates a JWT for the user, and returns an HTML\npage displaying the JWT token.\n\nArgs:\n    request (Request): The FastAPI request object.\n    code (str): The authorization code received from Google.\n    state (str, optional): The state parameter for CSRF protection.\n\nReturns:\n    HTMLResponse: An HTML page displaying the JWT token or an error message.\n\nRaises:\n    HTTPException: If there's an error during the authentication process.",
+          "operationId": "google_callback_auth_google_callback_get",
+          "parameters": [
+            {
+              "name": "code",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "title": "Code"
+              }
+            },
+            {
+              "name": "state",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "string",
+                "title": "State"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "text/html": {
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/create-session": {
+        "get": {
+          "tags": [
+            "chat"
+          ],
+          "summary": "Create Session Id",
+          "description": "Generate a unique session and returns the ID.\n\nReturns:\n    dict: A dictionary containing the generated session ID.",
+          "operationId": "create_session_id_create_session_get",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "title": "Authorization"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {}
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/get-session-code": {
+        "post": {
+          "summary": "Add Collaborator To Repo",
+          "description": "Adds the given username as collaborator to the session GitHub repository and returns the repository url.\n\nArgs:\n    owner (str): Repository owner's username\n    repo_name (str): Name of the repository\n    username (str): Username of the collaborator to add.\n\nReturns:\n    Optional[Dict[str, Any]]: A dictionary containing repository details if the collaborator is successfully added, \nor None if the operation fails.",
+          "operationId": "add_collaborator_to_repo_get_session_code_post",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollaborationRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "anyOf": [
+                      {
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Response Add Collaborator To Repo Get Session Code Post"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/chat": {
+        "post": {
+          "tags": [
+            "chat"
+          ],
+          "summary": "Chat Repo",
+          "description": "Process a chat request and return a streaming response.\n\nThis endpoint handles the main interaction with the AI assistant. It creates or retrieves\na session for the user and processes the chat prompt.\n\nList of possible agent values - \"GeneralCodingAgent\",\"RepoAgent\",\"FrontEndAgent\".\n\nArgs:\n    req (UserRequest): The user's chat request containing session ID and prompt.\n    current_user (dict): The authenticated user's information.\nReturns:\n    StreamingResponse: A streaming response containing the AI assistant's reply.",
+          "operationId": "chat_repo_chat_post",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "title": "Authorization"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {}
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "CollaborationRequest": {
+          "properties": {
+            "sid": {
+              "type": "string",
+              "title": "Sid"
+            },
+            "github_username": {
+              "type": "string",
+              "title": "Github Username"
+            }
+          },
+          "type": "object",
+          "required": [
+            "sid",
+            "github_username"
+          ],
+          "title": "CollaborationRequest"
+        },
+        "HTTPValidationError": {
+          "properties": {
+            "detail": {
+              "items": {
+                "$ref": "#/components/schemas/ValidationError"
+              },
+              "type": "array",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "title": "HTTPValidationError"
+        },
+        "UserRequest": {
+          "properties": {
+            "sid": {
+              "type": "string",
+              "title": "Sid"
+            },
+            "prompt": {
+              "type": "string",
+              "title": "Prompt"
+            },
+            "agent": {
+              "type": "string",
+              "title": "Agent"
+            }
+          },
+          "type": "object",
+          "required": [
+            "sid",
+            "prompt"
+          ],
+          "title": "UserRequest"
+        },
+        "ValidationError": {
+          "properties": {
+            "loc": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
+              },
+              "type": "array",
+              "title": "Location"
+            },
+            "msg": {
+              "type": "string",
+              "title": "Message"
+            },
+            "type": {
+              "type": "string",
+              "title": "Error Type"
+            }
+          },
+          "type": "object",
+          "required": [
+            "loc",
+            "msg",
+            "type"
+          ],
+          "title": "ValidationError"
+        }
+      }
+    }
+  }

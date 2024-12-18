@@ -1,0 +1,22 @@
+{
+  "name": "github-context-bot",
+  "version": "1.0.0",
+  "description": "A GitHub bot that understands PR context and makes intelligent code changes",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@octokit/rest": "^19.0.7",
+    "@octokit/webhooks": "^10.9.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "openai": "^3.2.1"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "nodemon": "^2.0.22"
+  }
+}
